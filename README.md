@@ -1,0 +1,72 @@
+# ERP Lookup Script
+
+This project helps you avoid manual one-by-one web searching.
+
+It reads coop account names from CSV or Excel, searches the web for each account, and estimates which ERP system is most likely in use (from three ERP targets by default).
+
+## What it does
+
+- Input: CSV or XLSX with an account-name column
+- Search: SerpApi (Google results) per account by default
+- Scoring: Looks for ERP mentions in search result titles/snippets
+- Output:
+  - `erp_summary.csv` (quick review table)
+  - `erp_summary.json` (full evidence details)
+
+## Install
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Run
+
+Set your SerpApi key:
+
+```bash
+export SERPAPI_API_KEY="your_key_here"
+```
+
+Use CSV with SerpApi (default engine):
+
+```bash
+python erp_lookup.py sample_accounts.csv --account-column account
+```
+
+Use Excel:
+
+```bash
+python erp_lookup.py your_accounts.xlsx --account-column "Account Name"
+```
+
+Use DuckDuckGo fallback:
+
+```bash
+python erp_lookup.py sample_accounts.csv --account-column account --engine ddg
+```
+
+## Default ERP systems tracked
+
+- AGRIS
+- Agvance
+- Merchant Ag
+
+## Override ERP systems
+
+```bash
+python erp_lookup.py sample_accounts.csv --erp SAP Infor Epicor
+```
+
+## Suggested workflow
+
+1. Run the script against your full account list.
+2. Sort by `confidence` in `erp_summary.csv`.
+3. Manually verify low-confidence rows first.
+4. Keep the JSON file as your audit trail.
+
+## Notes
+
+- Direct Google scraping is brittle and can violate terms. This script uses `duckduckgo-search` as a practical starting point.
+- Confidence is heuristic and intended to prioritize review, not guarantee correctness.

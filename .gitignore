@@ -1,0 +1,17 @@
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+
+# Local caches
+.mypy_cache/
+.pytest_cache/
+
+# Runtime output files
+erp_summary.csv
+erp_summary.json
