@@ -8,10 +8,6 @@ __pycache__/
 .venv/
 venv/
 
-# Local secrets
-.env
-.env.*
-
 # Local caches
 .mypy_cache/
 .pytest_cache/
@@ -19,3 +15,7 @@ venv/
 # Runtime output files
 erp_summary.csv
 erp_summary.json
+
+.env
+
+
