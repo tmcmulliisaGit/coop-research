@@ -110,3 +110,12 @@ Output files:
 
 - `link_names.csv`
 - `link_names.json`
+- `link_names_accounts.csv` (parsed from `City: Co-op Name` text)
+
+For pages like the Kansas co-op list, use `*_accounts.csv` with ERP lookup. It includes:
+
+- `account`: combined value (`City Co-op Name`) for better search context
+- `city`
+- `coop_name`
+- `source_text`
+- `href`

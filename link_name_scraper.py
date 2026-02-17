@@ -30,6 +30,15 @@ class LinkRecord:
     href: str
 
 
+@dataclass
+class AccountRecord:
+    account: str
+    city: str
+    coop_name: str
+    source_text: str
+    href: str
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Extract names from links on a webpage.")
     parser.add_argument("url", help="Page URL to scrape.")
@@ -145,9 +154,48 @@ def extract_links(
     return out
 
 
-def write_outputs(records: list[LinkRecord], output_prefix: str) -> tuple[Path, Path]:
+def parse_city_coop(text: str) -> tuple[str, str] | None:
+    if ":" not in text:
+        return None
+    city, coop_name = text.split(":", 1)
+    city = normalize_spaces(city)
+    coop_name = normalize_spaces(coop_name)
+    if not city or not coop_name:
+        return None
+    return city, coop_name
+
+
+def build_account_records(records: list[LinkRecord]) -> list[AccountRecord]:
+    out: list[AccountRecord] = []
+    seen: set[str] = set()
+
+    for row in records:
+        parsed = parse_city_coop(row.text or row.name)
+        if not parsed:
+            continue
+        city, coop_name = parsed
+        account = normalize_spaces(f"{city} {coop_name}")
+        key = account.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(
+            AccountRecord(
+                account=account,
+                city=city,
+                coop_name=coop_name,
+                source_text=row.text,
+                href=row.href,
+            )
+        )
+
+    return out
+
+
+def write_outputs(records: list[LinkRecord], output_prefix: str) -> tuple[Path, Path, Path]:
     csv_path = Path(f"{output_prefix}.csv")
     json_path = Path(f"{output_prefix}.json")
+    accounts_path = Path(f"{output_prefix}_accounts.csv")
 
     with csv_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["name", "text", "href"])
@@ -158,7 +206,16 @@ def write_outputs(records: list[LinkRecord], output_prefix: str) -> tuple[Path, 
     with json_path.open("w", encoding="utf-8") as f:
         json.dump([row.__dict__ for row in records], f, indent=2)
 
-    return csv_path, json_path
+    account_records = build_account_records(records)
+    with accounts_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=["account", "city", "coop_name", "source_text", "href"]
+        )
+        writer.writeheader()
+        for row in account_records:
+            writer.writerow(row.__dict__)
+
+    return csv_path, json_path, accounts_path
 
 
 def main() -> int:
@@ -178,10 +235,11 @@ def main() -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
-    csv_path, json_path = write_outputs(records, args.output_prefix)
+    csv_path, json_path, accounts_path = write_outputs(records, args.output_prefix)
     print(f"Extracted {len(records)} names.")
     print(f"Wrote CSV: {csv_path}")
     print(f"Wrote JSON: {json_path}")
+    print(f"Wrote accounts CSV: {accounts_path}")
     return 0
 
 
