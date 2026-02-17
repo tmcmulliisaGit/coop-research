@@ -23,10 +23,11 @@ pip install -r requirements.txt
 
 ## Run
 
-Set your SerpApi key:
+Create a local `.env` file for keys:
 
 ```bash
-export SERPAPI_API_KEY="your_key_here"
+SERPAPI_API_KEY=your_serpapi_key
+OPENAI_API_KEY=your_openai_key
 ```
 
 Use CSV with SerpApi (default engine):
@@ -46,6 +47,18 @@ Use DuckDuckGo fallback:
 ```bash
 python erp_lookup.py sample_accounts.csv --account-column account --engine ddg
 ```
+
+Use LLM scoring on top of search results:
+
+```bash
+python erp_lookup.py sample_accounts.csv --account-column account --scorer llm
+```
+
+Notes:
+
+- `.env` is auto-loaded by `erp_lookup.py`.
+- CLI flags still override `.env` values (`--serpapi-api-key`, `--openai-api-key`).
+- LLM scoring now uses OpenAI **Responses API** (`/v1/responses`), which supports newer models.
 
 ## Default ERP systems tracked
 
@@ -70,3 +83,30 @@ python erp_lookup.py sample_accounts.csv --erp SAP Infor Epicor
 
 - Direct Google scraping is brittle and can violate terms. This script uses `duckduckgo-search` as a practical starting point.
 - Confidence is heuristic and intended to prioritize review, not guarantee correctness.
+
+## Link Name Scraper
+
+Use this when you need to pull names from links on a webpage.
+
+Basic run:
+
+```bash
+python link_name_scraper.py "https://example.com/members"
+```
+
+Only keep links that contain a pattern and stay on the same domain:
+
+```bash
+python link_name_scraper.py "https://example.com/members" --contains /member/ --same-domain
+```
+
+If names are in URL slugs instead of link text:
+
+```bash
+python link_name_scraper.py "https://example.com/members" --name-source href-last-segment
+```
+
+Output files:
+
+- `link_names.csv`
+- `link_names.json`

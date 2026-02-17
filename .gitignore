@@ -8,6 +8,10 @@ __pycache__/
 .venv/
 venv/
 
+# Local secrets
+.env
+.env.*
+
 # Local caches
 .mypy_cache/
 .pytest_cache/
