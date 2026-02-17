@@ -2,7 +2,7 @@
 
 This project helps you avoid manual one-by-one web searching.
 
-It reads coop account names from CSV or Excel, searches the web for each account, and estimates which ERP system is most likely in use (from three ERP targets by default).
+It reads coop account names from CSV or Excel, searches the web for each account, and estimates which ERP system is most likely in use (from four ERP targets by default).
 
 ## What it does
 
@@ -54,6 +54,34 @@ Use LLM scoring on top of search results:
 python erp_lookup.py sample_accounts.csv --account-column account --scorer llm
 ```
 
+## Command-line arguments (`erp_lookup.py`)
+
+Positional:
+
+- `input_file` (required): Path to input `.csv`, `.xlsx`, `.xlsm`, or `.xls`.
+
+Options:
+
+- `--account-column` (default: `account`): Column name containing account names.
+- `--erp` (default: built-in list): One or more ERP names to track.  
+  Example: `--erp AGRIS Agvance "Merchant Ag" AgTrax`
+- `--queries-per-account` (default: `6`): Number of web results to inspect per account.
+- `--sleep-seconds` (default: `1.5`): Delay between account searches.
+- `--output-prefix` (default: `erp_summary`): Output prefix; writes `<prefix>.csv` and `<prefix>.json`.
+- `--query-template` (default includes `{account}` and ERP terms): Search query template. Must contain `{account}`.
+- `--engine` (default: `serpapi`, choices: `serpapi`, `ddg`): Search backend.
+- `--serpapi-api-key` (default: unset): SerpApi key. If omitted, reads `SERPAPI_API_KEY` from environment or `.env`.
+- `--scorer` (default: `heuristic`, choices: `heuristic`, `llm`): ERP scoring method.
+- `--openai-api-key` (default: unset): OpenAI key for `--scorer llm`. If omitted, reads `OPENAI_API_KEY` from environment or `.env`.
+- `--llm-model` (default: `gpt-4.1-mini`): Model to use with `--scorer llm`.
+- `--openai-base-url` (default: `https://api.openai.com/v1`): Base URL for OpenAI-compatible API.
+
+Requirements by mode:
+
+- `--engine serpapi` requires a SerpApi key (`--serpapi-api-key` or `SERPAPI_API_KEY`).
+- `--engine ddg` does not require SerpApi.
+- `--scorer llm` requires an OpenAI key (`--openai-api-key` or `OPENAI_API_KEY`).
+
 Notes:
 
 - `.env` is auto-loaded by `erp_lookup.py`.
@@ -65,6 +93,7 @@ Notes:
 - AGRIS
 - Agvance
 - Merchant Ag
+- AgTrax
 
 ## Override ERP systems
 

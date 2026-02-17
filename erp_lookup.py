@@ -27,6 +27,7 @@ DEFAULT_ERP_ALIASES = {
     "AGRIS": ["agris", "agris erp", "agris business", "agri business software"],
     "Agvance": ["agvance", "agvance software", "agvance agri-business"],
     "Merchant Ag": ["merchant ag", "merchantag", "merchant agriculture"],
+    "AgTrax": ["agtrax", "ag trax", "agtrax erp", "agtrax software"],
 }
 
 
@@ -90,7 +91,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "Optional custom ERP names (example: --erp AGRIS Agvance \"Merchant Ag\"). "
-            "If omitted, defaults to AGRIS, Agvance, Merchant Ag."
+            "If omitted, defaults to AGRIS, Agvance, Merchant Ag, AgTrax."
         ),
     )
     parser.add_argument(
@@ -112,7 +113,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--query-template",
-        default='"{account}" (ERP OR "enterprise resource planning" OR AGRIS OR Agvance OR "Merchant Ag")',
+        default='"{account}" (ERP OR "enterprise resource planning" OR AGRIS OR Agvance OR "Merchant Ag" OR AgTrax)',
         help="Search query template. Must include {account}.",
     )
     parser.add_argument(
